@@ -56,7 +56,7 @@ func (w *BotWorkers) AddDefaultClient(client *gotgproto.Client, self *tg.User) {
 		Self:   self,
 		log:    w.log,
 	})
-	w.log.Sugar().Info("Default bot loaded")
+	w.log.Sugar().Info("默认机器人已加载")
 }
 
 func (w *BotWorkers) incStarting() {
@@ -72,7 +72,7 @@ func (w *BotWorkers) Add(token string) (err error) {
 	if err != nil {
 		return err
 	}
-	w.log.Sugar().Infof("Bot @%s loaded with ID %d", client.Self.Username, botID)
+	w.log.Sugar().Infof("机器人 @%s 已加载，ID 为 %d", client.Self.Username, botID)
 	w.Bots = append(w.Bots, &Worker{
 		Client: client,
 		ID:     botID,
@@ -96,15 +96,15 @@ func StartWorkers(log *zap.Logger) (*BotWorkers, error) {
 	Workers.Init(log)
 
 	if len(config.ValueOf.MultiTokens) == 0 {
-		Workers.log.Sugar().Info("No worker bot tokens provided, skipping worker initialization")
+		Workers.log.Sugar().Info("未提供工作机器人 Token，跳过工作机器人初始化")
 		return Workers, nil
 	}
-	Workers.log.Sugar().Info("Starting")
+	Workers.log.Sugar().Info("正在启动")
 	if config.ValueOf.UseSessionFile {
-		Workers.log.Sugar().Info("Using session file for workers")
+		Workers.log.Sugar().Info("使用会话文件存储工作机器人")
 		newpath := filepath.Join(".", "sessions")
 		if err := os.MkdirAll(newpath, os.ModePerm); err != nil {
-			Workers.log.Error("Failed to create sessions directory", zap.Error(err))
+			Workers.log.Error("创建会话目录失败", zap.Error(err))
 			return nil, err
 		}
 	}
@@ -130,24 +130,24 @@ func StartWorkers(log *zap.Logger) (*BotWorkers, error) {
 			select {
 			case err := <-done:
 				if err != nil {
-					Workers.log.Error("Failed to start worker", zap.Int("index", i), zap.Error(err))
+					Workers.log.Error("启动工作机器人失败", zap.Int("index", i), zap.Error(err))
 				} else {
 					atomic.AddInt32(&successfulStarts, 1)
 				}
 			case <-ctx.Done():
-				Workers.log.Error("Timed out starting worker", zap.Int("index", i))
+				Workers.log.Error("启动工作机器人超时", zap.Int("index", i))
 			}
 		}(i)
 	}
 
 	wg.Wait() // Wait for all goroutines to finish
-	Workers.log.Sugar().Infof("Successfully started %d/%d bots", successfulStarts, totalBots)
+	Workers.log.Sugar().Infof("成功启动 %d/%d 个机器人", successfulStarts, totalBots)
 	return Workers, nil
 }
 
 func startWorker(l *zap.Logger, botToken string, index int) (*gotgproto.Client, error) {
 	log := l.Named("Worker").Sugar()
-	log.Infof("Starting worker with index - %d", index)
+	log.Infof("正在启动工作机器人，索引 - %d", index)
 	var sessionType sessionMaker.SessionConstructor
 	if config.ValueOf.UseSessionFile {
 		sessionType = sessionMaker.SqlSession(sqlite.Open(fmt.Sprintf("sessions/worker-%d.session", index)))

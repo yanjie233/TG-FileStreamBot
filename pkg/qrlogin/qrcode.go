@@ -51,7 +51,7 @@ func clearQrCode(writer *CustomWriter) {
 func GenerateQRSession(apiId int, apiHash string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	fmt.Println("Generating QR session...")
+	fmt.Println("正在生成二维码会话...")
 	reader := bufio.NewReader(os.Stdin)
 	dispatcher := tg.NewUpdateDispatcher()
 	loggedIn := qrlogin.OnLoginToken(dispatcher)
@@ -75,7 +75,7 @@ func GenerateQRSession(apiId int, apiHash string) error {
 			}
 			clearQrCode(qrWriter)
 			printQrCode(token.URL(), qrWriter)
-			qrWriter.Write([]byte("\nTo log in, Open your Telegram app and go to Settings > Devices > Scan QR and scan the QR code.\n"))
+			qrWriter.Write([]byte("\n要登录，请打开 Telegram 应用，进入 设置 > 设备 > 扫描二维码，然后扫描上方的二维码。\n"))
 			go func(ctx context.Context) {
 				ticker := time.NewTicker(1 * time.Second)
 				defer ticker.Stop()
@@ -88,7 +88,7 @@ func GenerateQRSession(apiId int, apiHash string) error {
 						if expiresIn <= 0 {
 							return
 						}
-						fmt.Printf("\rThis code expires in %s", expiresIn.Truncate(time.Second))
+						fmt.Printf("\r此二维码将在 %s 后过期", expiresIn.Truncate(time.Second))
 					}
 				}
 			}(tickerCtx)
@@ -97,15 +97,15 @@ func GenerateQRSession(apiId int, apiHash string) error {
 		if err != nil {
 			if tgerr.Is(err, "SESSION_PASSWORD_NEEDED") {
 				cancelTicker()
-				fmt.Println("\n2FA password is required, enter it below: ")
+				fmt.Println("\n需要两步验证密码，请在下方输入: ")
 				passkey, _ := reader.ReadString('\n')
 				strippedPasskey := strings.TrimSpace(passkey)
 				authorization, err = client.Auth().Password(ctx, strippedPasskey)
 				if err != nil {
 					if err.Error() == "invalid password" {
-						fmt.Println("Invalid password, please try again.")
+						fmt.Println("密码无效，请重试。")
 					}
-					fmt.Println("Error while logging in: ", err)
+					fmt.Println("登录时出错: ", err)
 					return nil
 				}
 			}
@@ -119,9 +119,9 @@ func GenerateQRSession(apiId int, apiHash string) error {
 			return err
 		}
 		if user.Username == "" {
-			fmt.Println("Logged in as ", user.FirstName, user.LastName)
+			fmt.Println("已登录为 ", user.FirstName, user.LastName)
 		} else {
-			fmt.Println("Logged in as @", user.Username)
+			fmt.Println("已登录为 @", user.Username)
 		}
 		res, _ := sessionStorage.LoadSession(ctx)
 		type jsonDataStruct struct {
@@ -134,13 +134,13 @@ func GenerateQRSession(apiId int, apiHash string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Your pyrogram session string:", stringSession)
+		fmt.Println("您的 Pyrogram 会话字符串:", stringSession)
 		client.API().MessagesSendMessage(
 			ctx,
 			&tg.MessagesSendMessageRequest{
 				NoWebpage: true,
 				Peer:      &tg.InputPeerSelf{},
-				Message:   "Your pyrogram session string: " + stringSession,
+				Message:   "您的 Pyrogram 会话字符串: " + stringSession,
 			},
 		)
 		return nil

@@ -3,15 +3,15 @@ package stream
 import "errors"
 
 var (
-	// the client disconnected before the stream completed.
-	ErrStreamClosed = errors.New("stream closed by client")
+	// 客户端在流完成前断开连接
+	ErrStreamClosed = errors.New("客户端已断开连接")
 
-	// a block fetch exceeded the timeout.
-	ErrBlockTimeout = errors.New("block fetch timed out")
+	// 数据块获取超时
+	ErrBlockTimeout = errors.New("数据块获取超时")
 
-	// all retry attempts failed.
-	ErrMaxRetriesExceeded = errors.New("max retries exceeded")
+	// 所有重试尝试均失败
+	ErrMaxRetriesExceeded = errors.New("已超过最大重试次数")
 
-	// the pipe was closed and all data was consumed.
-	ErrPipeDrained = errors.New("pipe drained")
+	// 管道已关闭且所有数据已消费
+	ErrPipeDrained = errors.New("管道已排空")
 )

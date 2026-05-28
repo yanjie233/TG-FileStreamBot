@@ -70,7 +70,7 @@ func NewStreamPipe(
 ) (io.ReadCloser, error) {
 
 	if start > end {
-		return nil, fmt.Errorf("invalid range: start (%d) > end (%d)", start, end)
+		return nil, fmt.Errorf("无效的范围: start (%d) > end (%d)", start, end)
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -307,8 +307,8 @@ func (p *StreamPipe) downloadBlock(ctx context.Context, offset int64) ([]byte, e
 	case *tg.UploadFileCDNRedirect:
 		// handle CDN redirect if needed (not implemented here, but could be added)
 		// https://core.telegram.org/cdn
-		return nil, fmt.Errorf("CDN redirect not supported in this implementation (redirect to DC %d)", result.DCID)
+		return nil, fmt.Errorf("当前实现不支持 CDN 重定向（重定向到 DC %d）", result.DCID)
 	default:
-		return nil, fmt.Errorf("unexpected response type: %T", res)
+		return nil, fmt.Errorf("意外的响应类型: %T", res)
 	}
 }

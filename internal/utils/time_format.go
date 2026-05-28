@@ -11,32 +11,16 @@ func TimeFormat(seconds uint64) (timeStr string) {
 	days, hours := bits.Div64(0, hours, 24)
 	timeStr = ""
 	if days > 0 {
-		if days == 1 {
-			timeStr += fmt.Sprintf("%d day, ", days)
-		} else {
-			timeStr += fmt.Sprintf("%d days, ", days)
-		}
+		timeStr += fmt.Sprintf("%d 天 ", days)
 	}
 	if hours > 0 {
-		if hours == 1 {
-			timeStr += fmt.Sprintf("%d hour, ", hours)
-		} else {
-			timeStr += fmt.Sprintf("%d hours, ", hours)
-		}
+		timeStr += fmt.Sprintf("%d 小时 ", hours)
 	}
 	if minutes > 0 {
-		if minutes == 1 {
-			timeStr += fmt.Sprintf("%d minute, ", minutes)
-		} else {
-			timeStr += fmt.Sprintf("%d minutes, ", minutes)
-		}
+		timeStr += fmt.Sprintf("%d 分钟 ", minutes)
 	}
 	if seconds > 0 {
-		if seconds == 1 {
-			timeStr += fmt.Sprintf("%d second", seconds)
-		} else {
-			timeStr += fmt.Sprintf("%d seconds", seconds)
-		}
+		timeStr += fmt.Sprintf("%d 秒", seconds)
 	}
 	return timeStr
 }

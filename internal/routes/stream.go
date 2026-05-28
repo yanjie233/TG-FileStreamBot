@@ -38,7 +38,7 @@ func getStreamRoute(ctx *gin.Context) {
 
 	authHash := ctx.Query("hash")
 	if authHash == "" {
-		http.Error(w, "missing hash param", http.StatusBadRequest)
+		http.Error(w, "缺少 hash 参数", http.StatusBadRequest)
 		return
 	}
 
@@ -59,7 +59,7 @@ func getStreamRoute(ctx *gin.Context) {
 		file.ID,
 	)
 	if !utils.CheckHash(authHash, expectedHash) {
-		http.Error(w, "invalid hash", http.StatusBadRequest)
+		http.Error(w, "无效的 hash", http.StatusBadRequest)
 		return
 	}
 
@@ -76,7 +76,7 @@ func getStreamRoute(ctx *gin.Context) {
 		}
 		result, ok := res.(*tg.UploadFile)
 		if !ok {
-			http.Error(w, "unexpected response", http.StatusInternalServerError)
+			http.Error(w, "意外的响应", http.StatusInternalServerError)
 			return
 		}
 		fileBytes := result.GetBytes()

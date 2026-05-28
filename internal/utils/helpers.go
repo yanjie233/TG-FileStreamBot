@@ -59,7 +59,7 @@ func GetTGMessage(ctx context.Context, client *gotgproto.Client, messageID int) 
 	if _, ok := message.(*tg.Message); ok {
 		return message.(*tg.Message), nil
 	} else {
-		return nil, fmt.Errorf("this file was deleted")
+		return nil, fmt.Errorf("此文件已被删除")
 	}
 }
 
@@ -68,7 +68,7 @@ func FileFromMedia(media tg.MessageMediaClass) (*types.File, error) {
 	case *tg.MessageMediaDocument:
 		document, ok := media.Document.AsNotEmpty()
 		if !ok {
-			return nil, fmt.Errorf("unexpected type %T", media)
+			return nil, fmt.Errorf("意外的类型 %T", media)
 		}
 		var fileName string
 		for _, attribute := range document.Attributes {
@@ -87,16 +87,16 @@ func FileFromMedia(media tg.MessageMediaClass) (*types.File, error) {
 	case *tg.MessageMediaPhoto:
 		photo, ok := media.Photo.AsNotEmpty()
 		if !ok {
-			return nil, fmt.Errorf("unexpected type %T", media)
+			return nil, fmt.Errorf("意外的类型 %T", media)
 		}
 		sizes := photo.Sizes
 		if len(sizes) == 0 {
-			return nil, errors.New("photo has no sizes")
+			return nil, errors.New("图片没有尺寸信息")
 		}
 		photoSize := sizes[len(sizes)-1]
 		size, ok := photoSize.AsNotEmpty()
 		if !ok {
-			return nil, errors.New("photo size is empty")
+			return nil, errors.New("图片尺寸为空")
 		}
 		location := new(tg.InputPhotoFileLocation)
 		location.ID = photo.GetID()
@@ -155,7 +155,7 @@ func GetLogChannelPeer(ctx context.Context, api *tg.Client, peerStorage *storage
 			AccessHash: peer.AccessHash,
 		}, nil
 	default:
-		return nil, errors.New("unexpected type of input peer")
+		return nil, errors.New("意外的输入对等体类型")
 	}
 	inputChannel := &tg.InputChannel{
 		ChannelID: config.ValueOf.LogChannelID,
@@ -165,11 +165,11 @@ func GetLogChannelPeer(ctx context.Context, api *tg.Client, peerStorage *storage
 		return nil, err
 	}
 	if len(channels.GetChats()) == 0 {
-		return nil, errors.New("no channels found")
+		return nil, errors.New("未找到频道")
 	}
 	channel, ok := channels.GetChats()[0].(*tg.Channel)
 	if !ok {
-		return nil, errors.New("type assertion to *tg.Channel failed")
+		return nil, errors.New("类型断言为 *tg.Channel 失败")
 	}
 	// Bruh, I literally have to call library internal functions at this point
 	peerStorage.AddPeer(channel.GetID(), channel.AccessHash, storage.TypeChannel, "")
@@ -179,7 +179,7 @@ func GetLogChannelPeer(ctx context.Context, api *tg.Client, peerStorage *storage
 func ForwardMessages(ctx *ext.Context, fromChatId, toChatId int64, messageID int) (*tg.Updates, error) {
 	fromPeer := ctx.PeerStorage.GetInputPeerById(fromChatId)
 	if fromPeer.Zero() {
-		return nil, fmt.Errorf("fromChatId: %d is not a valid peer", fromChatId)
+		return nil, fmt.Errorf("fromChatId: %d 不是有效的对等体", fromChatId)
 	}
 	toPeer, err := GetLogChannelPeer(ctx, ctx.Raw, ctx.PeerStorage)
 	if err != nil {

@@ -12,8 +12,8 @@ const versionString = "3.2.0"
 
 var rootCmd = &cobra.Command{
 	Use:               "fsb [command]",
-	Short:             "Telegram File Stream Bot",
-	Long:              "Telegram Bot to generate direct streamable links for telegram media.",
+	Short:             "Telegram 文件直链机器人",
+	Long:              "Telegram 机器人，用于为 Telegram 媒体文件生成可直接播放/下载的链接。",
 	Example:           "fsb run --port 8080",
 	Version:           versionString,
 	CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
@@ -26,7 +26,7 @@ func init() {
 	config.SetFlagsFromConfig(runCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(sessionCmd)
-	rootCmd.SetVersionTemplate(fmt.Sprintf(`Telegram File Stream Bot version %s`, versionString))
+	rootCmd.SetVersionTemplate(fmt.Sprintf(`Telegram 文件直链机器人 版本 %s`, versionString))
 }
 
 func main() {

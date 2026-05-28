@@ -23,9 +23,9 @@ func start(ctx *ext.Context, u *ext.Update) error {
 		return dispatcher.EndGroups
 	}
 	if len(config.ValueOf.AllowedUsers) != 0 && !utils.Contains(config.ValueOf.AllowedUsers, chatId) {
-		ctx.Reply(u, ext.ReplyTextString("You are not allowed to use this bot."), nil)
+		ctx.Reply(u, ext.ReplyTextString("你没有权限使用此机器人。"), nil)
 		return dispatcher.EndGroups
 	}
-	ctx.Reply(u, ext.ReplyTextString("Hi, send me any file to get a direct streamable link to that file."), nil)
+	ctx.Reply(u, ext.ReplyTextString("你好，欢迎使用此机器人，给我发一个 文件/视频/图片/音频 我可以帮你生成直链。"), nil)
 	return dispatcher.EndGroups
 }

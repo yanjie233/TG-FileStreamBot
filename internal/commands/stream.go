@@ -47,7 +47,7 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 		return dispatcher.EndGroups
 	}
 	if len(config.ValueOf.AllowedUsers) != 0 && !utils.Contains(config.ValueOf.AllowedUsers, chatId) {
-		ctx.Reply(u, ext.ReplyTextString("You are not allowed to use this bot."), nil)
+		ctx.Reply(u, ext.ReplyTextString("你没有权限使用此机器人。"), nil)
 		return dispatcher.EndGroups
 	}
 	supported, err := supportedMediaFilter(u.EffectiveMessage)
@@ -55,39 +55,39 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 		return err
 	}
 	if !supported {
-		ctx.Reply(u, ext.ReplyTextString("Sorry, this message type is unsupported."), nil)
+		ctx.Reply(u, ext.ReplyTextString("抱歉，不支持此消息类型。"), nil)
 		return dispatcher.EndGroups
 	}
 	update, err := utils.ForwardMessages(ctx, chatId, config.ValueOf.LogChannelID, u.EffectiveMessage.ID)
 	if err != nil {
 		utils.Logger.Sugar().Error(err)
-		ctx.Reply(u, ext.ReplyTextString(fmt.Sprintf("Error - %s", err.Error())), nil)
+		ctx.Reply(u, ext.ReplyTextString(fmt.Sprintf("错误 - %s", err.Error())), nil)
 		return dispatcher.EndGroups
 	}
 	if len(update.Updates) < 2 {
-		ctx.Reply(u, ext.ReplyTextString("Error - unexpected update structure from Telegram"), nil)
+		ctx.Reply(u, ext.ReplyTextString("错误 - Telegram 返回了意外的更新结构"), nil)
 		return dispatcher.EndGroups
 	}
 	msgIDUpdate, ok := update.Updates[0].(*tg.UpdateMessageID)
 	if !ok {
-		ctx.Reply(u, ext.ReplyTextString("Error - unexpected update type"), nil)
+		ctx.Reply(u, ext.ReplyTextString("错误 - 意外的更新类型"), nil)
 		return dispatcher.EndGroups
 	}
 	messageID := msgIDUpdate.ID
 	newMsg, ok := update.Updates[1].(*tg.UpdateNewChannelMessage)
 	if !ok {
-		ctx.Reply(u, ext.ReplyTextString("Error - unexpected channel message update"), nil)
+		ctx.Reply(u, ext.ReplyTextString("错误 - 意外的频道消息更新"), nil)
 		return dispatcher.EndGroups
 	}
 	msg, ok := newMsg.Message.(*tg.Message)
 	if !ok {
-		ctx.Reply(u, ext.ReplyTextString("Error - unexpected message type"), nil)
+		ctx.Reply(u, ext.ReplyTextString("错误 - 意外的消息类型"), nil)
 		return dispatcher.EndGroups
 	}
 	doc := msg.Media
 	file, err := utils.FileFromMedia(doc)
 	if err != nil {
-		ctx.Reply(u, ext.ReplyTextString(fmt.Sprintf("Error - %s", err.Error())), nil)
+		ctx.Reply(u, ext.ReplyTextString(fmt.Sprintf("错误 - %s", err.Error())), nil)
 		return dispatcher.EndGroups
 	}
 	fullHash := utils.PackFile(
@@ -102,14 +102,14 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	row := tg.KeyboardButtonRow{
 		Buttons: []tg.KeyboardButtonClass{
 			&tg.KeyboardButtonURL{
-				Text: "Download",
+				Text: "立即下载⤵️",
 				URL:  link + "&d=true",
 			},
 		},
 	}
 	if strings.Contains(file.MimeType, "video") || strings.Contains(file.MimeType, "audio") || strings.Contains(file.MimeType, "pdf") {
 		row.Buttons = append(row.Buttons, &tg.KeyboardButtonURL{
-			Text: "Stream",
+			Text: "在线播放🎦",
 			URL:  link,
 		})
 	}
@@ -130,7 +130,7 @@ func sendLink(ctx *ext.Context, u *ext.Update) error {
 	}
 	if err != nil {
 		utils.Logger.Sugar().Error(err)
-		ctx.Reply(u, ext.ReplyTextString(fmt.Sprintf("Error - %s", err.Error())), nil)
+		ctx.Reply(u, ext.ReplyTextString(fmt.Sprintf("错误 - %s", err.Error())), nil)
 	}
 	return dispatcher.EndGroups
 }

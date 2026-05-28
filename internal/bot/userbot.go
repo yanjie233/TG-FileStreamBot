@@ -20,10 +20,10 @@ var UserBot *UserBotStruct = &UserBotStruct{}
 func StartUserBot(l *zap.Logger) {
 	log := l.Named("USERBOT")
 	if config.ValueOf.UserSession == "" {
-		log.Warn("User session is empty")
+		log.Warn("用户会话为空")
 		return
 	}
-	log.Sugar().Infoln("Starting userbot")
+	log.Sugar().Infoln("正在启动用户机器人")
 	client, err := gotgproto.NewClient(
 		int(config.ValueOf.ApiID),
 		config.ValueOf.ApiHash,
@@ -34,20 +34,20 @@ func StartUserBot(l *zap.Logger) {
 		},
 	)
 	if err != nil {
-		log.Error("Failed to start userbot", zap.Error(err))
+		log.Error("启动用户机器人失败", zap.Error(err))
 		return
 	}
 	UserBot.log = log
 	UserBot.client = client
-	log.Info("Userbot started", zap.String("username", client.Self.Username), zap.String("FirstName", client.Self.FirstName), zap.String("LastName", client.Self.LastName))
+	log.Info("用户机器人已启动", zap.String("username", client.Self.Username), zap.String("FirstName", client.Self.FirstName), zap.String("LastName", client.Self.LastName))
 	if err := UserBot.AddBotsAsAdmins(); err != nil {
-		log.Error("Failed to add bots as admins", zap.Error(err))
+		log.Error("添加机器人管理员失败", zap.Error(err))
 		return
 	}
 }
 
 func (u *UserBotStruct) AddBotsAsAdmins() error {
-	u.log.Info("Preparing to add bots as admins")
+	u.log.Info("正在准备添加机器人管理员")
 	ctx := u.client.CreateContext()
 	channel := config.ValueOf.LogChannelID
 	channelInfos, err := u.client.API().ChannelsGetChannels(
@@ -59,11 +59,11 @@ func (u *UserBotStruct) AddBotsAsAdmins() error {
 		},
 	)
 	if err != nil {
-		u.log.Error("Failed to get channel info", zap.Error(err))
-		return errors.New("failed to get channel info")
+		u.log.Error("获取频道信息失败", zap.Error(err))
+		return errors.New("获取频道信息失败")
 	}
 	if len(channelInfos.GetChats()) == 0 {
-		return errors.New("no channels found")
+		return errors.New("未找到频道")
 	}
 	inputChannel := channelInfos.GetChats()[0].(*tg.Channel).AsInput()
 	currentAdmins := []int64{}
@@ -74,7 +74,7 @@ func (u *UserBotStruct) AddBotsAsAdmins() error {
 		Limit:   100,
 	})
 	if err != nil {
-		u.log.Error("Failed to get admins", zap.Error(err))
+		u.log.Error("获取管理员列表失败", zap.Error(err))
 		return err
 	}
 	for _, admin := range admins.(*tg.ChannelsChannelParticipants).Participants {
@@ -86,7 +86,7 @@ func (u *UserBotStruct) AddBotsAsAdmins() error {
 		isAdmin := false
 		for _, admin := range currentAdmins {
 			if admin == bot.Self.ID {
-				u.log.Sugar().Infof("Bot @%s is already an admin", bot.Self.Username)
+				u.log.Sugar().Infof("机器人 @%s 已经是管理员", bot.Self.Username)
 				isAdmin = true
 				continue
 			}
@@ -110,10 +110,10 @@ func (u *UserBotStruct) AddBotsAsAdmins() error {
 			},
 		)
 		if err != nil {
-			u.log.Sugar().Warnf("Failed to add @%s as admin", bot.Self.Username)
+			u.log.Sugar().Warnf("添加 @%s 为管理员失败", bot.Self.Username)
 			u.log.Warn(err.Error())
 		}
-		u.log.Sugar().Infof("Added @%s as admin", bot.Self.Username)
+		u.log.Sugar().Infof("已添加 @%s 为管理员", bot.Self.Username)
 	}
 	return nil
 }
