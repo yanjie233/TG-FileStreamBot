@@ -20,7 +20,22 @@
     << <a href="https://filestream.bot/getting-started">Visit docs 浏览文档</a> |  <a href="https://filestream.bot/support">Support 获取支持（原作者英文社区）</a> >>
   </p>
 </p>
+      
+---
+      
+### 🛠️ 自动化一键安装 (支持 Debian / Ubuntu / Alpine) - 测试版
 
+请在终端执行以下命令进行安装或管理：
+
+```bash
+# 使用 curl 执行
+curl -fsSL [https://raw.githubusercontent.com/yanjie233/TG-FileStreamBot/main/cn_install.sh](https://raw.githubusercontent.com/yanjie233/TG-FileStreamBot/main/cn_install.sh) | bash
+```
+```bash
+# 如果系统没有 curl，也可以使用 wget 执行
+wget -qO- [https://raw.githubusercontent.com/yanjie233/TG-FileStreamBot/main/cn_install.sh](https://raw.githubusercontent.com/yanjie233/TG-FileStreamBot/main/cn_install.sh) | bash
+```
+如果存在问题请提Issues~
 ---
 
 ### Credits  致谢/鸣谢
