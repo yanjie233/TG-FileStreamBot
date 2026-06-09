@@ -1,5 +1,5 @@
 > [!TIP]
-> 喜欢这个项目吗？对这个项目感兴趣吗？欢迎访问原仓库和给他们点上一个star吧！[点我前往原项目仓库](https://github.com/EverythingSuckz/TG-FileStreamBot)
+> 喜欢这个项目吗？对这个项目感兴趣吗？欢迎访问原仓库和给他们点上一个star吧！[点我前往原项目仓库](https://github.com/EverythingSuckz/TG-FileStreamBot)。也请给我一个star吧!
 
 > [!TIP]
 > Need the English version? [Click me!](https://github.com/EverythingSuckz/TG-FileStreamBot)
