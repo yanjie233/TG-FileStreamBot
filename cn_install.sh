@@ -301,18 +301,28 @@ get_release_asset_url() {
         error "无法获取发布信息"
         return 1
     fi
+    # 更稳健的解析：先定位 name 行号，再在接下来的几行内查找 browser_download_url
+    local line_no
+    line_no=$(grep -n -m1 "\"name\": \"${asset_name}\"" "$api_resp" | cut -d: -f1 || true)
+    if [[ -n "$line_no" ]]; then
+        local url
+        url=$(sed -n "${line_no},$((line_no+20))p" "$api_resp" | grep -m1 '"browser_download_url"' | sed -E 's/.*"browser_download_url": *"([^"]+)".*/\1/' || true)
+        if [[ -n "$url" ]]; then
+            echo "$url"
+            return 0
+        fi
+    fi
 
-    awk -v target="$asset_name" '
-        $0 ~ "\"name\": \"" target "\"" { in_asset = 1 }
-        in_asset && /"browser_download_url"/ {
-            line = $0
-            sub(/^.*"browser_download_url": "/, "", line)
-            sub(/".*$/, "", line)
-            print line
-            exit
-        }
-        in_asset && /\}/ { in_asset = 0 }
-    ' "$api_resp"
+    # 兜底：尝试全文件搜索（兼容单行或不同格式）
+    grep -oE '"browser_download_url": *"[^"]+"' "$api_resp" | sed -E 's/"browser_download_url": *"([^"]+)"/\1/' | while read -r u; do
+        # 若 URL 中包含 asset_name 则返回
+        if [[ "$u" == *"${asset_name}"* ]]; then
+            echo "$u"
+            return 0
+        fi
+    done
+
+    return 0
 }
 
 # ============================================================
@@ -895,7 +905,7 @@ uninstall() {
 show_menu() {
     echo ""
     echo -e "${BOLD}========================================${NC}"
-    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.1${NC}"
+    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.0.2${NC}"
     echo -e "${BOLD}========================================${NC}"
 
     # 显示当前状态
