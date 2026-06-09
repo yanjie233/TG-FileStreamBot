@@ -303,19 +303,36 @@ install_binary() {
     version=$(get_latest_version) || return 1
     info "最新版本: ${BOLD}${version}${NC}"
 
-    local binary_name="fsb-linux-${ARCH}"
-    local url="${GITHUB_DOWNLOAD}/${version}/${binary_name}"
+    local legacy_binary_name="fsb-linux-${ARCH}"
+    local legacy_url="${GITHUB_DOWNLOAD}/${version}/${legacy_binary_name}"
+    local archive_name="TG-FileStreamBot-${version}-linux-${ARCH}.tar.gz"
+    local archive_url="${GITHUB_DOWNLOAD}/${version}/${archive_name}"
 
     info "系统架构: ${ARCH}"
-    info "下载地址: ${url}"
+    info "下载地址(优先): ${legacy_url}"
 
     local tmpdir
     tmpdir=$(mktempdir)
-    local tmpfile="${tmpdir}/${binary_name}"
+    local tmpfile="${tmpdir}/fsb"
 
     info "正在下载二进制文件..."
-    if ! download_file "$url" "$tmpfile"; then
-        error "下载失败，请检查网络连接"
+    if download_file "$legacy_url" "$tmpfile"; then
+        :
+    elif download_file "$archive_url" "${tmpdir}/${archive_name}"; then
+        if ! tar -xzf "${tmpdir}/${archive_name}" -C "$tmpdir"; then
+            error "下载成功但解压失败: ${archive_name}"
+            return 1
+        fi
+
+        local extracted
+        extracted=$(find "$tmpdir" -maxdepth 2 -type f -name "fsb" | head -n1 || true)
+        if [[ -z "$extracted" ]]; then
+            error "在压缩包中未找到 fsb 可执行文件"
+            return 1
+        fi
+        mv -f "$extracted" "$tmpfile"
+    else
+        error "下载失败，请检查网络连接或发布资源是否存在"
         return 1
     fi
 
