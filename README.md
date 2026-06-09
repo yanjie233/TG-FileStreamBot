@@ -22,6 +22,9 @@
 </p>
       
 ---
+
+### [👉👉👉全中文手把手喂饭教程👈👈👈](https://tg-fsb.notion.site)
+
       
 ### 🛠️ 自动化一键安装 (支持 Debian / Ubuntu / Alpine) - 测试版
 
@@ -36,6 +39,7 @@ curl -fsSL [https://raw.githubusercontent.com/yanjie233/TG-FileStreamBot/main/cn
 wget -qO- [https://raw.githubusercontent.com/yanjie233/TG-FileStreamBot/main/cn_install.sh](https://raw.githubusercontent.com/yanjie233/TG-FileStreamBot/main/cn_install.sh) | bash
 ```
 如果存在问题请提Issues~
+
 ---
 
 ### Credits  致谢/鸣谢
