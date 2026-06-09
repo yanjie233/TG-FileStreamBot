@@ -13,7 +13,7 @@ LOG_DIR="/var/log/fsb"
 SERVICE_NAME="fsb"
 REPO="yanjie233/TG-FileStreamBot"
 GITHUB_API="https://api.github.com/repos/${REPO}/releases/latest"
-GITHUB_DOWNLOAD="https://github.com/${REPO}/releases/download"
+GITHUB_DOWNLOAD="https://raw.githubusercontent.com/${REPO}"
 
 # 运行时检测
 DISTRO=""
@@ -646,7 +646,7 @@ generate_config() {
 
     # 读取现有值作为默认值
     local def_api_id="" def_api_hash="" def_bot_token="" def_log_channel=""
-    local def_port="8080" def_host="" def_hash_length="6"
+    local def_port="80" def_host="" def_hash_length="6"
     local def_use_session="true" def_use_public_ip="false" def_allowed_users=""
     local def_concurrency="4" def_buffer="8" def_timeout="30" def_retries="3"
 
@@ -866,7 +866,7 @@ uninstall() {
 show_menu() {
     echo ""
     echo -e "${BOLD}========================================${NC}"
-    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.0${NC}"
+    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.1${NC}"
     echo -e "${BOLD}========================================${NC}"
 
     # 显示当前状态
@@ -1052,8 +1052,8 @@ main() {
 
     echo -e "${BOLD}${CYAN}"
     echo "  ╔══════════════════════════════════════╗"
-    echo "  ║  TG-FileStreamBot 安装管理工具      ║"
-    echo "  ║  https://github.com/yanjie233/FSB   ║"
+    echo "  ║  TG-FileStreamBot 安装管理工具        ║"
+    echo "  ║  https://github.com/yanjie233/TG-FileStreamBot   ║"
     echo "  ╚══════════════════════════════════════╝"
     echo -e "${NC}"
     info "系统: ${DISTRO} | 架构: ${ARCH} | 初始化: ${INIT_SYSTEM}"
