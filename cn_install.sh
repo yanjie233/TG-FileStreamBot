@@ -324,12 +324,15 @@ install_binary() {
             fi
 
             local extracted
-            extracted=$(find "$tmpdir" -type f -name "fsb" | head -n1 || true)
+            extracted=$(find "$tmpdir" -type f -name "fsb" | head -n1)
             if [[ -z "$extracted" ]]; then
                 error "在压缩包中未找到 fsb 可执行文件"
                 return 1
             fi
-            mv -f "$extracted" "$tmpfile"
+            if ! mv -f "$extracted" "$tmpfile"; then
+                error "移动解压后的二进制文件失败"
+                return 1
+            fi
         else
             error "下载失败，请检查网络连接或发布资源是否存在"
             return 1
