@@ -558,6 +558,40 @@ stop_service_silent() {
     fi
 }
 
+install_shortcut() {
+    header "创建 fsb 快捷方式"
+
+    local target="/usr/local/bin/fsb"
+    # 尝试解析当前脚本的绝对路径
+    local src
+    if command -v readlink &>/dev/null; then
+        src=$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || true)
+    fi
+    src=${src:-"${BASH_SOURCE[0]}"}
+
+    if [[ ! -f "$src" ]]; then
+        warn "未能解析当前脚本路径，尝试使用 pwd 下的文件"
+        src="$(pwd)/$(basename "$0")"
+    fi
+
+    if [[ ! -f "$src" ]]; then
+        error "找不到脚本源文件: ${src}"
+        return 1
+    fi
+
+    cp -f "$src" "$target" || { error "复制到 ${target} 失败"; return 1; }
+    chmod +x "$target"
+    success "已创建快捷方式: ${target}"
+    info "输入 fsb 即可打开管理菜单"
+}
+
+remove_shortcut() {
+    local target="/usr/local/bin/fsb"
+    if [[ -f "$target" ]]; then
+        rm -f "$target" && success "已移除快捷方式: ${target}" || warn "删除 ${target} 失败"
+    fi
+}
+
 restart_service() {
     header "重启服务"
 
@@ -894,6 +928,9 @@ uninstall() {
     rm -rf "$INSTALL_DIR"
     rm -rf "$LOG_DIR"
 
+    # 删除快捷方式
+    remove_shortcut
+
     CURRENT_VERSION=""
     success "卸载完成"
 }
@@ -905,7 +942,7 @@ uninstall() {
 show_menu() {
     echo ""
     echo -e "${BOLD}========================================${NC}"
-    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.0.2${NC}"
+    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.1${NC}"
     echo -e "${BOLD}========================================${NC}"
 
     # 显示当前状态
@@ -1047,6 +1084,9 @@ cli_main() {
             ;;
         uninstall)
             uninstall
+            ;;
+        shortcut)
+            install_shortcut
             ;;
         *)
             error "未知命令: $cmd"
