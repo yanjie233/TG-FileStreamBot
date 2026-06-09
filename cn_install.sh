@@ -616,6 +616,21 @@ restart_service() {
     fi
 }
 
+post_install_prompt() {
+    echo ""
+    if prompt_confirm "安装已完成，是否现在创建配置文件并启动服务？" "N"; then
+        generate_config
+        echo ""
+        if prompt_confirm "是否立即启动服务？" "Y"; then
+            start_service
+        else
+            info "已完成安装和配置，服务未启动"
+        fi
+    else
+        info "已完成安装，请稍后手动配置并启动服务"
+    fi
+}
+
 show_service_status() {
     header "服务状态"
 
@@ -942,7 +957,7 @@ uninstall() {
 show_menu() {
     echo ""
     echo -e "${BOLD}========================================${NC}"
-    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.1${NC}"
+    echo -e "${BOLD}  TG-FileStreamBot 管理工具 v1.2${NC}"
     echo -e "${BOLD}========================================${NC}"
 
     # 显示当前状态
@@ -1057,9 +1072,7 @@ cli_main() {
         install)
             install_binary
             install_service
-            echo ""
-            info "安装完成！接下来请运行配置:"
-            echo -e "  ${CYAN}bash $0 config${NC}"
+            post_install_prompt
             ;;
         update)
             update_binary
