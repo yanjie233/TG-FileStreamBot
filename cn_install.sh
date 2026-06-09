@@ -316,24 +316,24 @@ install_binary() {
     local tmpfile="${tmpdir}/fsb"
 
     info "正在下载二进制文件..."
-    if download_file "$legacy_url" "$tmpfile"; then
-        :
-    elif download_file "$archive_url" "${tmpdir}/${archive_name}"; then
-        if ! tar -xzf "${tmpdir}/${archive_name}" -C "$tmpdir"; then
-            error "下载成功但解压失败: ${archive_name}"
-            return 1
-        fi
+    if ! download_file "$legacy_url" "$tmpfile"; then
+        if download_file "$archive_url" "${tmpdir}/${archive_name}"; then
+            if ! tar -xzf "${tmpdir}/${archive_name}" -C "$tmpdir"; then
+                error "下载成功但解压失败: ${archive_name}"
+                return 1
+            fi
 
-        local extracted
-        extracted=$(find "$tmpdir" -maxdepth 2 -type f -name "fsb" | head -n1 || true)
-        if [[ -z "$extracted" ]]; then
-            error "在压缩包中未找到 fsb 可执行文件"
+            local extracted
+            extracted=$(find "$tmpdir" -type f -name "fsb" | head -n1 || true)
+            if [[ -z "$extracted" ]]; then
+                error "在压缩包中未找到 fsb 可执行文件"
+                return 1
+            fi
+            mv -f "$extracted" "$tmpfile"
+        else
+            error "下载失败，请检查网络连接或发布资源是否存在"
             return 1
         fi
-        mv -f "$extracted" "$tmpfile"
-    else
-        error "下载失败，请检查网络连接或发布资源是否存在"
-        return 1
     fi
 
     chmod +x "$tmpfile"
