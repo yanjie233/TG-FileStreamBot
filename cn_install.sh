@@ -13,7 +13,6 @@ LOG_DIR="/var/log/fsb"
 SERVICE_NAME="fsb"
 REPO="yanjie233/TG-FileStreamBot"
 GITHUB_API="https://api.github.com/repos/${REPO}/releases/latest"
-GITHUB_DOWNLOAD="https://raw.githubusercontent.com/${REPO}"
 
 # 运行时检测
 DISTRO=""
@@ -292,6 +291,30 @@ get_latest_version() {
     echo "$tag"
 }
 
+get_release_asset_url() {
+    local asset_name="$1"
+    local tmpdir
+    tmpdir=$(mktempdir)
+    local api_resp="${tmpdir}/api.json"
+
+    if ! download_api "$GITHUB_API" "$api_resp"; then
+        error "无法获取发布信息"
+        return 1
+    fi
+
+    awk -v target="$asset_name" '
+        $0 ~ "\"name\": \"" target "\"" { in_asset = 1 }
+        in_asset && /"browser_download_url"/ {
+            line = $0
+            sub(/^.*"browser_download_url": "/, "", line)
+            sub(/".*$/, "", line)
+            print line
+            exit
+        }
+        in_asset && /\}/ { in_asset = 0 }
+    ' "$api_resp"
+}
+
 # ============================================================
 #  二进制安装/更新
 # ============================================================
@@ -304,7 +327,13 @@ install_binary() {
     info "最新版本: ${BOLD}${version}${NC}"
 
     local binary_name="fsb-linux-${ARCH}"
-    local url="${GITHUB_DOWNLOAD}/${version}/${binary_name}"
+    local url
+    url=$(get_release_asset_url "$binary_name") || return 1
+
+    if [[ -z "$url" ]]; then
+        error "未找到对应的发布资源: ${binary_name}"
+        return 1
+    fi
 
     info "系统架构: ${ARCH}"
     info "下载地址: ${url}"
@@ -646,7 +675,7 @@ generate_config() {
 
     # 读取现有值作为默认值
     local def_api_id="" def_api_hash="" def_bot_token="" def_log_channel=""
-    local def_port="80" def_host="" def_hash_length="6"
+    local def_port="8080" def_host="" def_hash_length="6"
     local def_use_session="true" def_use_public_ip="false" def_allowed_users=""
     local def_concurrency="4" def_buffer="8" def_timeout="30" def_retries="3"
 
@@ -1052,8 +1081,8 @@ main() {
 
     echo -e "${BOLD}${CYAN}"
     echo "  ╔══════════════════════════════════════╗"
-    echo "  ║  TG-FileStreamBot 安装管理工具        ║"
-    echo "  ║  https://github.com/yanjie233/TG-FileStreamBot   ║"
+    echo "  ║  TG-FileStreamBot 安装管理工具       ║"
+    echo "  ║https://github.com/yanjie233/TG-FileStreamBot║"
     echo "  ╚══════════════════════════════════════╝"
     echo -e "${NC}"
     info "系统: ${DISTRO} | 架构: ${ARCH} | 初始化: ${INIT_SYSTEM}"
